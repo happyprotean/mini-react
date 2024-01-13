@@ -1,0 +1,23 @@
+{
+  "name": "mini-react",
+  "version": "1.0.0",
+  "description": "Build a mini version of react myself.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/happyprotean/mini-react.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/happyprotean/mini-react/issues"
+  },
+  "homepage": "https://github.com/happyprotean/mini-react#readme",
+  "dependencies": {
+    "@eslint/js": "^8.56.0",
+    "eslint": "^8.56.0"
+  }
+}
