@@ -4,7 +4,7 @@
   "description": "Build a mini version of react myself.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@eslint/js": "^8.56.0",
     "eslint": "^8.56.0",
-    "standard": "^17.1.0"
+    "standard": "^17.1.0",
+    "vitest": "^1.2.0"
   }
 }
