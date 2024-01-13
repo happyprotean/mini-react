@@ -16,8 +16,9 @@
     "url": "https://github.com/happyprotean/mini-react/issues"
   },
   "homepage": "https://github.com/happyprotean/mini-react#readme",
-  "dependencies": {
+  "devDependencies": {
     "@eslint/js": "^8.56.0",
-    "eslint": "^8.56.0"
+    "eslint": "^8.56.0",
+    "standard": "^17.1.0"
   }
 }
