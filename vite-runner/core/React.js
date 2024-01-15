@@ -17,7 +17,9 @@ function createElement(type, props, ...children) {
     props: {
       ...props,
       children: children.map((child) => {
-        return typeof child === 'string' ? createTextNode(child) : child
+        const isTextNode =
+          typeof child === 'string' || typeof child === 'number'
+        return isTextNode ? createTextNode(child) : child
       }),
     },
   }
@@ -37,8 +39,7 @@ function updateProps(dom, props) {
   })
 }
 
-function initChildren(fiber) {
-  const children = fiber.props.children
+function initChildren(fiber, children) {
   let prevChild = null
   children.forEach((child, index) => {
     const newFiber = {
@@ -47,7 +48,7 @@ function initChildren(fiber) {
       child: null,
       parent: fiber,
       sibling: null,
-      dom: null
+      dom: null,
     }
     if (index === 0) {
       fiber.child = newFiber
@@ -62,15 +63,15 @@ function render(el, container) {
   nextWorkUnit = {
     dom: container,
     props: {
-      children: [el]
-    }
+      children: [el],
+    },
   }
   root = nextWorkUnit
 }
 
 function getParentSibling(parent) {
   let sibling = null
-  while(parent) {
+  while (parent) {
     sibling = parent.sibling
     if (sibling) break
     parent = parent.parent
@@ -78,15 +79,31 @@ function getParentSibling(parent) {
   return sibling
 }
 
-function performWorkOfUnit(fiber) {
+function updateFunctionComponent(fiber) {
+  // 函数式组件不需要dom
+  const children = [fiber.type(fiber.props)]
+  initChildren(fiber, children)
+}
+
+function updateHostComponnet(fiber) {
   if (!fiber.dom) {
     const dom = (fiber.dom = createDom(fiber.type))
     updateProps(dom, fiber.props)
   }
+  const children = fiber.props.children
+  initChildren(fiber, children)
+}
 
-  initChildren(fiber)
+function performWorkOfUnit(fiber) {
+  const isFunctionComponent = typeof fiber.type === 'function'
 
-  if(fiber.child) return fiber.child
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber)
+  } else {
+    updateHostComponnet(fiber)
+  }
+
+  if (fiber.child) return fiber.child
   if (fiber.sibling) return fiber.sibling
   return getParentSibling(fiber.parent)
 }
@@ -98,14 +115,25 @@ function commitRoot() {
 
 function commitWork(fiber) {
   if (!fiber) return
-  fiber.parent.dom.append(fiber.dom) 
+  let fiberParent = fiber.parent
+  // 虚拟组件本身没有dom，需要找到其最近的非函数组件
+  while (fiberParent) {
+    if (fiberParent.dom) {
+      break
+    }
+    fiberParent = fiberParent.parent
+  }
+  // 虚拟组件本身没有dom，不需要添加dom
+  if (fiber.dom) {
+    fiberParent.dom.append(fiber.dom)
+  }
   commitWork(fiber.child)
   commitWork(fiber.sibling)
 }
 
 function workLoop(deadline) {
   let shouldYield = false
-  while(!shouldYield && nextWorkUnit) {
+  while (!shouldYield && nextWorkUnit) {
     nextWorkUnit = performWorkOfUnit(nextWorkUnit)
     shouldYield = deadline.timeRemaining() < 10
   }
