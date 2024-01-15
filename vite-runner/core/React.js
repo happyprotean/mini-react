@@ -1,4 +1,5 @@
-let nextWorkUnit = null
+let nextWorkUnit = null // 下一个fiber任务
+let root = null // 根节点fiber任务
 
 function createTextNode(text) {
   return {
@@ -64,6 +65,7 @@ function render(el, container) {
       children: [el]
     }
   }
+  root = nextWorkUnit
 }
 
 function getParentSibling(parent) {
@@ -79,9 +81,6 @@ function getParentSibling(parent) {
 function performWorkOfUnit(fiber) {
   if (!fiber.dom) {
     const dom = (fiber.dom = createDom(fiber.type))
-
-    fiber.parent.dom.append(dom)
-
     updateProps(dom, fiber.props)
   }
 
@@ -92,11 +91,26 @@ function performWorkOfUnit(fiber) {
   return getParentSibling(fiber.parent)
 }
 
+function commitRoot() {
+  commitWork(root.child)
+  root = null // dom只添加一次
+}
+
+function commitWork(fiber) {
+  if (!fiber) return
+  fiber.parent.dom.append(fiber.dom) 
+  commitWork(fiber.child)
+  commitWork(fiber.sibling)
+}
+
 function workLoop(deadline) {
   let shouldYield = false
   while(!shouldYield && nextWorkUnit) {
     nextWorkUnit = performWorkOfUnit(nextWorkUnit)
     shouldYield = deadline.timeRemaining() < 10
+  }
+  if (!nextWorkUnit && root) {
+    commitRoot() // 统一进行dom插入操作
   }
   requestIdleCallback(workLoop)
 }
