@@ -1,10 +1,20 @@
 import React from './core/React'
+
 function AppFn() {
   return <div id="app">hi mini react</div>
 }
 
+function handleClick() {
+  console.log('clicked') 
+}
+
 function Counter({ num }) {
-  return <div>count: {num}</div>
+  return (
+    <div>
+      <div>count: {num}</div>
+      <button onClick={handleClick}>button</button>
+    </div>
+  )
 }
 
 function CounterContainer() {
@@ -28,6 +38,8 @@ function App() {
   )
 }
 
-console.log(App)
-console.log(AppFn)
+// console.log(AppFn)
+// ƒ AppFn() {
+//   return /* @__PURE__ */ React.createElement("div", { id: "app" }, "hi mini react");
+// }
 export default App

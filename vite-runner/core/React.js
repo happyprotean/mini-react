@@ -33,7 +33,11 @@ function createDom(type) {
 
 function updateProps(dom, props) {
   Object.keys(props).forEach((key) => {
-    if (key !== 'children') {
+    if (key.startsWith('on')) {
+      // onClick -> click
+      const eventType = key.slice(2).toLowerCase()
+      dom.addEventListener(eventType, props[key])
+    } else if (key !== 'children') {
       dom[key] = props[key]
     }
   })
